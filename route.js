@@ -22,5 +22,8 @@ module.exports = function(app) {
     app.post('/fetchAllForAdmin', requireSignin, controller.fetchAllforAdmin)
     app.post('/fetchUserForAdmin', requireSignin, controller.fetchUserForAdmin)
     app.post('/fetchByIdForAdmin', requireSignin, controller.fetchByIdForAdmin)
-    
+    app.post('/DailyWork', requireSignin, controller.DailyWork)
+    app.post('/WorkByName', controller.DailyWork)
+    app.post('/WorkByDay', controller.DailyWork) 
+    app.post('/fetchAuth', controller.DailyWork)
 } 

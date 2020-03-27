@@ -274,7 +274,9 @@ exports.fetchWorkforUser = (req, res, next) => {
     var userId = body.userId
     req.getConnection((err, connection) => {
         if(err) return next(err)
-    var sql = "SELECT*FROM `sila-lawer`.work WHERE `sila-lawer`.`work`.idUser=? ;"
+    var sql = "SELECT `user-sila`.name, `work`.idUser, `work`.date, `work`.time, \
+              `work`.clientName, `work`.partner, `work`.matterCode, `work`.descriptions, `work`.timestamp \
+               FROM `user-sila`, `work`  WHERE `work`.idUser = `user-sila`.id  AND `work`.idUser=? ;"
     connection.query(sql, [userId], (err, results) => {
         if(err){
             return next(err)
@@ -294,7 +296,7 @@ exports.fetchWorkforUser = (req, res, next) => {
 exports.fetchAllforAdmin = (req, res, next) => {
     req.getConnection((err, connection) => {
         if(err) return next(err)
-        var sql = "SELECT `user-sila`.name, `user-sila`.email, `work`.date, `work`.time, \
+        var sql = "SELECT `work`.id , `user-sila`.name, `user-sila`.email, `work`.date, `work`.time, \
         `work`.clientName, `work`.partner,\
         `work`.matterCode, `work`.descriptions , `work`.timestamp\
         FROM `sila-lawer`.`work`, `sila-lawer`.`user-sila` \
@@ -316,7 +318,7 @@ exports.fetchAllforAdmin = (req, res, next) => {
 exports.fetchUserForAdmin = (req, res, next) => {
     req.getConnection((err, connection) => {
         if(err) return next(err)
-        var sql = "SELECT*FROM `sila-lawer`.`user-sila`;"
+        var sql = "SELECT*FROM `sila-lawer`.`user-sila` WHERE `user-sila`.status = 0 ;"
         connection.query(sql, [], (err, results) => {
             if(err){
                 return next(err)
@@ -371,6 +373,33 @@ exports.updateIndex = (req, res, next) => {
         date = ? , time = ? , clientName = ? , \
         partner = ? , matterCode = ? , descriptions = ? WHERE work.id = ? ;"
         connection.query(sql, [idUser, date, time, clientName, partner, matterCode, descriptions, workId], (err, results) => {
+            if(err){
+                return next(err)
+            }else{
+                res.json({
+                    success:"success",
+                    message:results,
+                    message_th:null
+                })
+            }
+        })
+    })
+}
+
+exports.DailyWork = (req, res, next) => {
+    var today = new Date();
+    var dd = String(today.getDate()).padStart(2, '0');
+    var mm = String(today.getMonth() + 1).padStart(2, '0'); 
+    var yyyy = today.getFullYear();
+
+    today = yyyy + '-' + mm + '-' + dd;
+    req.getConnection((err, connection) => {
+        if(err) return next(err)
+        var sql = "SELECT work.idUser, `user-sila`.name, work.date, work.time,\
+        work.clientName, work.partner, work.matterCode, work.descriptions,\
+        work.timestamp  FROM `sila-lawer`.`user-sila`, `sila-lawer`.work \
+        WHERE `work`.idUser = `user-sila`.id AND work.date = ? ORDER BY work.timestamp DESC"
+        connection.query(sql, [today], (err, results) => {
             if(err){
                 return next(err)
             }else{
