@@ -26,7 +26,7 @@ app.use(myConnection(mysql, configdata.dbOption, "pool"));
 routes(app);
 
 app.listen(PORT, () => {
-    console.log("ready server on http://localhost:" + PORT);
+    console.log("ready server on http://128.199.179.127:" + PORT);
 });
 
 

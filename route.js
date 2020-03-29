@@ -23,7 +23,8 @@ module.exports = function(app) {
     app.post('/fetchUserForAdmin', requireSignin, controller.fetchUserForAdmin)
     app.post('/fetchByIdForAdmin', requireSignin, controller.fetchByIdForAdmin)
     app.post('/DailyWork', requireSignin, controller.DailyWork)
-    app.post('/WorkByName', controller.DailyWork)
-    app.post('/WorkByDay', controller.DailyWork) 
-    app.post('/fetchAuth', controller.DailyWork)
+    // app.post('/WorkByName', controller.DailyWork)
+    app.post('/AdmminOptions', requireSignin, controller.WorkByOptions) 
+    // app.post('/fetchAuth', controller.DailyWork)
+    app.post('/Division', requireSignin, controller.fetchDivision)
 } 

@@ -412,3 +412,53 @@ exports.DailyWork = (req, res, next) => {
         })
     })
 }
+
+exports.WorkByOptions = (req, res, next) => {
+    var { body } = req
+    var datef = body.datef
+    var datet = body.datet
+    req.getConnection((err, connection) => {
+        if(err) return next(err)
+        var sql = "SELECT work.idUser, `user-sila`.name, work.date, work.time,\
+        work.clientName, work.partner, work.matterCode, work.descriptions,\
+        work.timestamp  FROM `sila-lawer`.`user-sila`, `sila-lawer`.work \
+        WHERE `work`.idUser = `user-sila`.id AND `work`.date BETWEEN \
+        ? AND ? ORDER BY work.timestamp DESC"
+        connection.query(sql, [datef, datet], (err,results) => {
+            if(err){
+                return next(err)
+            }else{
+                res.json({
+                    success:"success",
+                    message:results,
+                    message_th:null
+                })
+            }
+        })
+    })
+} 
+
+exports.fetchDivision = (req, res, next) => {
+    var { body } = req
+    var partner = body.partner
+    req.getConnection((err, connection) => {
+        if(err) return next(err)
+        var sql = "SELECT work.idUser, `user-sila`.name, work.date, work.time,\
+        work.clientName, work.partner, work.matterCode, work.descriptions,\
+        work.timestamp  FROM `sila-lawer`.`user-sila`, `sila-lawer`.work \
+        WHERE `work`.idUser = `user-sila`.id AND `work`.partner=? \
+        ORDER BY work.timestamp DESC ;"
+        connection.query(sql, [partner], (err, results) => {
+            if(err){
+                return next(err)
+            }else{
+                res.json({
+                    success:"success",
+                    message:results,
+                    message_th:null
+                })
+            }
+        })
+    })
+
+}
