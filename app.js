@@ -7,7 +7,7 @@ const myConnection = require('express-myconnection')
 const configdata   = require('./confix')
 const routes       = require('./route')
 
-const PORT = 3020;
+const PORT = 3021;
 
 app.use(cors())
 app.use(
