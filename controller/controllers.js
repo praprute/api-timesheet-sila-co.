@@ -8,33 +8,37 @@ exports.signin = (req, res, next) => {
         body
     } = req;
 
-    var email       = body.email;
-    var password    = body.password;
+    var email = body.email;
+    var password = body.password;
 
     req.getConnection((err, connection) => {
-        if(err) return next(err)
-        var sql = "SELECT*FROM `sila-lawer`.`user-sila` WHERE email=? ;"
+        if (err) return next(err)
+        var sql = "SELECT*FROM `sila`.`user-sila` WHERE email=? ;"
         connection.query(sql, [email], (err, results) => {
-            if(err){
+            if (err) {
                 return next(err)
             }
 
-            if(!results.length){
+            if (!results.length) {
                 res.json({
                     success: "error",
                     message: null,
                     message_th: "ไม่พบบัญชีผู้ใช้"
                 })
             }
-            if(results[0].password !== password){
+            if (results[0].password !== password) {
                 res.json({
                     success: "error",
                     message: null,
                     message_th: "รหัสผ่านไม่ถูกต้อง"
                 })
-            }else{
-                const token = jwt.sign({ id: results.id}, config.secret)
-                res.cookie('t', token, {expire: new Date() + 9999})
+            } else {
+                const token = jwt.sign({
+                    id: results.id
+                }, config.secret)
+                res.cookie('t', token, {
+                    expire: new Date() + 9999
+                })
                 res.json({
                     success: "success",
                     message: results,
@@ -56,60 +60,62 @@ exports.signout = (req, res) => {
 
 exports.requireSignin = expressJwt({
     secret: config.secret,
-    userProperty:"auth"
+    userProperty: "auth"
 });
 
 exports.fetchAdmin = (req, res, next) => {
     req.getConnection((err, connection) => {
-        if(err) return next(err)
-        var sql = "SELECT*FROM `sila-lawer`.`user-sila` WHERE status = 1"
-        connection.query(sql , [], (err, results) => {
-            if(err){
+        if (err) return next(err)
+        var sql = "SELECT*FROM `sila`.`user-sila` WHERE status = 1"
+        connection.query(sql, [], (err, results) => {
+            if (err) {
                 return next(err)
-            }else{
+            } else {
                 res.json({
-                    success:"success",
-                    message:results,
-                    message_th:""
+                    success: "success",
+                    message: results,
+                    message_th: ""
                 })
             }
         })
     })
-} 
+}
 
 exports.isAuthorAdmin = (req, res, next) => {
 
-    var { body } = req
+    var {
+        body
+    } = req
     var email = body.email
 
     req.getConnection((err, connection) => {
-        if(err) return next(err)
+        if (err) return next(err)
 
-        var sql = "SELECT `user-sila`.status FROM `sila-lawer`.`user-sila` \
+        var sql = "SELECT `user-sila`.status FROM `sila`.`user-sila` \
         WHERE `user-sila`.email = ? ;"
 
         connection.query(sql, [email], (err, results) => {
-            if(err){
+            if (err) {
                 return next(err)
             }
-            
-            if(results[0].status == 1){
+
+            if (results[0].status == 1) {
                 res.json({
-                    success:"success",
-                    message:"Admin",
-                    message_th:"Admin"
+                    success: "success",
+                    message: "Admin",
+                    message_th: "Admin"
                 })
-            }else if(results[0].status == 0){
+            } else if (results[0].status == 0) {
                 res.json({
-                    success:"success",
-                    message:"Auth",
-                    message_th:"Auth"
+                    success: "success",
+                    message: "Auth",
+                    message_th: "Auth"
                 })
-            }else{
+            } else {
                 res.json({
-                    success:"error",
-                    message:"error",
-                    message_th:"error"
+                    success: "error",
+                    message: "error",
+                    message_th: "error"
                 })
             }
         })
@@ -118,78 +124,80 @@ exports.isAuthorAdmin = (req, res, next) => {
 
 exports.regisIndex = (req, res, next) => {
 
-    var { body } = req;
+    var {
+        body
+    } = req;
 
-    var idUser          = body.idUser;
-    var date            = body.date;
-    var time            = body.time;
-    var clientName      = body.clientName;
-    var partner         = body.partner;
-    var matterCode      = body.matterCode;
-    var descriptions    = body.descriptions;
+    var idUser = body.idUser;
+    var date = body.date;
+    var time = body.time;
+    var clientName = body.clientName;
+    var partner = body.partner;
+    var matterCode = body.matterCode;
+    var descriptions = body.descriptions;
 
     req.getConnection((err, connection) => {
-        if(err) return next(err)
+        if (err) return next(err)
 
-        if(date.length > 0){
-            if(time.length > 0){
-                if(clientName.length > 0){
-                    if( partner.length > 0){
-                        if(matterCode.length > 0){
-                            if(descriptions.length > 0){
-                                var sql = "INSERT INTO `sila-lawer`.`work` \
+        if (date.length > 0) {
+            if (time.length > 0) {
+                if (clientName.length > 0) {
+                    if (partner.length > 0) {
+                        if (matterCode.length > 0) {
+                            if (descriptions.length > 0) {
+                                var sql = "INSERT INTO `sila`.`work` \
                                 ( idUser, date, time, clientName, partner, matterCode, descriptions ) VALUES \
                                 (?, ?, ?, ?, ?, ?, ?); "
 
-                                connection.query(sql, [idUser,date,time,clientName,partner,matterCode,descriptions], (err, results) => {
-                                    if(err){
+                                connection.query(sql, [idUser, date, time, clientName, partner, matterCode, descriptions], (err, results) => {
+                                    if (err) {
                                         return next(err)
-                                    }else{
+                                    } else {
                                         res.json({
-                                            success:"success",
-                                            message:results,
-                                            message_th:"บันทึกข้อมูลเรียบร้อย"
+                                            success: "success",
+                                            message: results,
+                                            message_th: "บันทึกข้อมูลเรียบร้อย"
                                         })
                                     }
 
                                 })
 
-                            }else{
+                            } else {
                                 res.json({
                                     success: "error",
                                     message: null,
                                     message_th: "กรุณากรอกรายละเอียด"
                                 })
                             }
-                        }else{
+                        } else {
                             res.json({
                                 success: "error",
                                 message: null,
                                 message_th: "กรุณากรอก Matter code"
                             })
                         }
-                    }else{
+                    } else {
                         res.json({
                             success: "error",
                             message: null,
                             message_th: "กรุณากรอกชื่อ Partner"
                         })
                     }
-                }else{
+                } else {
                     res.json({
                         success: "error",
                         message: null,
                         message_th: "กรุณากรอกชื่อลูกความ"
                     })
                 }
-            }else{
+            } else {
                 res.json({
                     success: "error",
                     message: null,
                     message_th: "กรุณาลงเวลาในกรทำงาน"
                 })
             }
-        }else{
+        } else {
             res.json({
                 success: "error",
                 message: null,
@@ -205,35 +213,35 @@ exports.register = (req, res, next) => {
         body
     } = req;
 
-    var email       = body.email;
-    var password    = body.password;
-    var name        = body.name;
+    var email = body.email;
+    var password = body.password;
+    var name = body.name;
 
     req.getConnection((err, connection) => {
         if (err) return next(err)
 
-        if(name.length > 0){
+        if (name.length > 0) {
             console.log(name.length)
-            if(email.length > 0){
-                if(password.length > 0){
-                    var sql = "SELECT email FROM `sila-lawer`.`user-sila` WHERE email=? ;" 
+            if (email.length > 0) {
+                if (password.length > 0) {
+                    var sql = "SELECT email FROM `sila`.`user-sila` WHERE email=? ;"
                     connection.query(sql, [email], (err, results) => {
-                        if(err){
+                        if (err) {
                             return next(err)
                         }
-                        if(results.length > 0){
+                        if (results.length > 0) {
                             res.json({
                                 success: "error",
                                 message: null,
                                 message_th: "อีเมล์นี้มีผู้ใช้งานแล้ว"
                             });
-                        }else{
-                            var sql = "INSERT INTO `sila-lawer`.`user-sila` ( email, password, name) \
+                        } else {
+                            var sql = "INSERT INTO `sila`.`user-sila` ( email, password, name) \
                             VALUES (?, ?, ?);"
-                            connection.query(sql, [email,password,name], (err, results) => {
-                                if(err) {
-                                   return next(err)
-                                }else{
+                            connection.query(sql, [email, password, name], (err, results) => {
+                                if (err) {
+                                    return next(err)
+                                } else {
                                     res.json({
                                         success: "success",
                                         message: results,
@@ -243,15 +251,15 @@ exports.register = (req, res, next) => {
                             })
                         }
                     })
-                    
-                }else{
+
+                } else {
                     res.json({
                         success: "error",
                         message: null,
                         message_th: "password ไม่ถูกต้อง"
                     })
                 }
-            }else{
+            } else {
                 res.json({
                     success: "error",
                     message: null,
@@ -259,7 +267,7 @@ exports.register = (req, res, next) => {
                 })
             }
 
-        }else{
+        } else {
             res.json({
                 success: "error",
                 message: null,
@@ -270,45 +278,47 @@ exports.register = (req, res, next) => {
 }
 
 exports.fetchWorkforUser = (req, res, next) => {
-    var { body } = req
+    var {
+        body
+    } = req
     var userId = body.userId
     req.getConnection((err, connection) => {
-        if(err) return next(err)
-    var sql = "SELECT `user-sila`.name, `work`.idUser, `work`.date, `work`.time, \
+        if (err) return next(err)
+        var sql = "SELECT `user-sila`.name, `work`.idUser, `work`.date, `work`.time, \
               `work`.clientName, `work`.partner, `work`.matterCode, `work`.descriptions, `work`.timestamp \
                FROM `user-sila`, `work`  WHERE `work`.idUser = `user-sila`.id  AND `work`.idUser=? ;"
-    connection.query(sql, [userId], (err, results) => {
-        if(err){
-            return next(err)
-            //return console.log(err)
-        }else{
-            res.json({
-                success:"success",
-                message:results,
-                message_th:null
-            })
-            next
-        }
-    })
+        connection.query(sql, [userId], (err, results) => {
+            if (err) {
+                return next(err)
+                //return console.log(err)
+            } else {
+                res.json({
+                    success: "success",
+                    message: results,
+                    message_th: null
+                })
+                next
+            }
+        })
     })
 }
 
 exports.fetchAllforAdmin = (req, res, next) => {
     req.getConnection((err, connection) => {
-        if(err) return next(err)
+        if (err) return next(err)
         var sql = "SELECT `work`.id , `user-sila`.name, `user-sila`.email, `work`.date, `work`.time, \
         `work`.clientName, `work`.partner,\
         `work`.matterCode, `work`.descriptions , `work`.timestamp\
-        FROM `sila-lawer`.`work`, `sila-lawer`.`user-sila` \
+        FROM `sila`.`work`, `sila`.`user-sila` \
         WHERE `work`.idUser = `user-sila`.id  ORDER BY `work`.timestamp DESC;"
         connection.query(sql, [], (err, results) => {
-            if(err){
+            if (err) {
                 return next(err)
-            }else{
+            } else {
                 res.json({
-                    success:"success",
-                    message:results,
-                    message_th:"ข้อมูลโดยรวม"
+                    success: "success",
+                    message: results,
+                    message_th: "ข้อมูลโดยรวม"
                 })
             }
         })
@@ -317,16 +327,16 @@ exports.fetchAllforAdmin = (req, res, next) => {
 
 exports.fetchUserForAdmin = (req, res, next) => {
     req.getConnection((err, connection) => {
-        if(err) return next(err)
-        var sql = "SELECT*FROM `sila-lawer`.`user-sila` WHERE `user-sila`.status = 0 ;"
+        if (err) return next(err)
+        var sql = "SELECT*FROM `sila`.`user-sila` WHERE `user-sila`.status = 0 ;"
         connection.query(sql, [], (err, results) => {
-            if(err){
+            if (err) {
                 return next(err)
-            }else{
+            } else {
                 res.json({
-                    success:"success",
-                    message:results,
-                    message_th:null
+                    success: "success",
+                    message: results,
+                    message_th: null
                 })
             }
         })
@@ -334,23 +344,25 @@ exports.fetchUserForAdmin = (req, res, next) => {
 }
 
 exports.fetchByIdForAdmin = (req, res, next) => {
-    var { body } = req
+    var {
+        body
+    } = req
     var id = body.id
     req.getConnection((err, connection) => {
-        if(err) return next(err)
+        if (err) return next(err)
         var sql = "SELECT  `user-sila`.id,`user-sila`.name, `user-sila`.email, `work`.date, `work`.time, \
         `work`.clientName, `work`.partner,\
         `work`.matterCode, `work`.descriptions , `work`.timestamp\
-        FROM `sila-lawer`.`work`, `sila-lawer`.`user-sila` \
+        FROM `sila`.`work`, `sila`.`user-sila` \
         WHERE `work`.idUser = `user-sila`.id AND  `user-sila`.id = ? ORDER BY `work`.timestamp DESC;"
         connection.query(sql, [id], (err, results) => {
-            if(err){
+            if (err) {
                 return next(err)
-            }else{
+            } else {
                 res.json({
-                    success:"success",
-                    message:results,
-                    message_th:null
+                    success: "success",
+                    message: results,
+                    message_th: null
                 })
             }
         })
@@ -358,28 +370,30 @@ exports.fetchByIdForAdmin = (req, res, next) => {
 }
 
 exports.updateIndex = (req, res, next) => {
-    var { body } = req
-    var idUser          = body.idUser
-    var date            = body.date
-    var time            = body.time
-    var clientName      = body.clientName
-    var partner         = body.partner
-    var matterCode      = body.matterCode
-    var descriptions    = body.descriptions
-    var workId          = body.workId
+    var {
+        body
+    } = req
+    var idUser = body.idUser
+    var date = body.date
+    var time = body.time
+    var clientName = body.clientName
+    var partner = body.partner
+    var matterCode = body.matterCode
+    var descriptions = body.descriptions
+    var workId = body.workId
     req.getConnection((err, connection) => {
-        if(err) return next(err)
+        if (err) return next(err)
         var sql = "UPDATE work SET idUser = ? , \
         date = ? , time = ? , clientName = ? , \
         partner = ? , matterCode = ? , descriptions = ? WHERE work.id = ? ;"
         connection.query(sql, [idUser, date, time, clientName, partner, matterCode, descriptions, workId], (err, results) => {
-            if(err){
+            if (err) {
                 return next(err)
-            }else{
+            } else {
                 res.json({
-                    success:"success",
-                    message:results,
-                    message_th:null
+                    success: "success",
+                    message: results,
+                    message_th: null
                 })
             }
         })
@@ -389,24 +403,24 @@ exports.updateIndex = (req, res, next) => {
 exports.DailyWork = (req, res, next) => {
     var today = new Date();
     var dd = String(today.getDate()).padStart(2, '0');
-    var mm = String(today.getMonth() + 1).padStart(2, '0'); 
+    var mm = String(today.getMonth() + 1).padStart(2, '0');
     var yyyy = today.getFullYear();
 
     today = yyyy + '-' + mm + '-' + dd;
     req.getConnection((err, connection) => {
-        if(err) return next(err)
+        if (err) return next(err)
         var sql = "SELECT work.idUser, `user-sila`.name, work.date, work.time,\
         work.clientName, work.partner, work.matterCode, work.descriptions,\
-        work.timestamp  FROM `sila-lawer`.`user-sila`, `sila-lawer`.work \
+        work.timestamp  FROM `sila`.`user-sila`, `sila`.work \
         WHERE `work`.idUser = `user-sila`.id AND work.date = ? ORDER BY work.timestamp DESC"
         connection.query(sql, [today], (err, results) => {
-            if(err){
+            if (err) {
                 return next(err)
-            }else{
+            } else {
                 res.json({
-                    success:"success",
-                    message:results,
-                    message_th:null
+                    success: "success",
+                    message: results,
+                    message_th: null
                 })
             }
         })
@@ -414,48 +428,52 @@ exports.DailyWork = (req, res, next) => {
 }
 
 exports.WorkByOptions = (req, res, next) => {
-    var { body } = req
+    var {
+        body
+    } = req
     var datef = body.datef
     var datet = body.datet
     req.getConnection((err, connection) => {
-        if(err) return next(err)
+        if (err) return next(err)
         var sql = "SELECT work.idUser, `user-sila`.name, work.date, work.time,\
         work.clientName, work.partner, work.matterCode, work.descriptions,\
-        work.timestamp  FROM `sila-lawer`.`user-sila`, `sila-lawer`.work \
+        work.timestamp  FROM `sila`.`user-sila`, `sila`.work \
         WHERE `work`.idUser = `user-sila`.id AND `work`.date BETWEEN \
         ? AND ? ORDER BY work.timestamp DESC"
-        connection.query(sql, [datef, datet], (err,results) => {
-            if(err){
+        connection.query(sql, [datef, datet], (err, results) => {
+            if (err) {
                 return next(err)
-            }else{
+            } else {
                 res.json({
-                    success:"success",
-                    message:results,
-                    message_th:null
+                    success: "success",
+                    message: results,
+                    message_th: null
                 })
             }
         })
     })
-} 
+}
 
 exports.fetchDivision = (req, res, next) => {
-    var { body } = req
+    var {
+        body
+    } = req
     var partner = body.partner
     req.getConnection((err, connection) => {
-        if(err) return next(err)
+        if (err) return next(err)
         var sql = "SELECT work.idUser, `user-sila`.name, work.date, work.time,\
         work.clientName, work.partner, work.matterCode, work.descriptions,\
-        work.timestamp  FROM `sila-lawer`.`user-sila`, `sila-lawer`.work \
+        work.timestamp  FROM `sila`.`user-sila`, `sila`.work \
         WHERE `work`.idUser = `user-sila`.id AND `work`.partner=? \
         ORDER BY work.timestamp DESC ;"
         connection.query(sql, [partner], (err, results) => {
-            if(err){
+            if (err) {
                 return next(err)
-            }else{
+            } else {
                 res.json({
-                    success:"success",
-                    message:results,
-                    message_th:null
+                    success: "success",
+                    message: results,
+                    message_th: null
                 })
             }
         })

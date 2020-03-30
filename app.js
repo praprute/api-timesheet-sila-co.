@@ -22,6 +22,20 @@ app.use(
     })
 );
 
+var connection = mysql.createConnection({
+    host: '128.199.179.127',
+     user: 'silaadmin',
+     password: 'silaapp4920',
+     port: 3306,
+     database: 'sila'
+   });
+   
+   connection.connect((err) => {
+       if (err) {
+           return console.error(err);
+       }
+   });
+
 app.use(myConnection(mysql, configdata.dbOption, "pool"));
 routes(app);
 
