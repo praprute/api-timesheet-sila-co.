@@ -143,7 +143,6 @@ exports.regisIndex = (req, res, next) => {
             if (time.length > 0) {
                 if (clientName.length > 0) {
                     if (partner.length > 0) {
-                        if (matterCode.length > 0) {
                             if (descriptions.length > 0) {
                                 var sql = "INSERT INTO `sila`.`work` \
                                 ( idUser, date, time, clientName, partner, matterCode, descriptions ) VALUES \
@@ -169,13 +168,6 @@ exports.regisIndex = (req, res, next) => {
                                     message_th: "กรุณากรอกรายละเอียด"
                                 })
                             }
-                        } else {
-                            res.json({
-                                success: "error",
-                                message: null,
-                                message_th: "กรุณากรอก Matter code"
-                            })
-                        }
                     } else {
                         res.json({
                             success: "error",
