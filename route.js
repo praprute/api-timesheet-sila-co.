@@ -15,7 +15,9 @@ module.exports = function(app) {
     app.post('/checkStatus', isAuthorAdmin)
     app.post('/signout', controller.signout)
     app.post('/fetchworkByIdForUser', requireSignin, controller.fetchWorkforUser)
-    app.post('/editIndex',  requireSignin,controller.updateIndex)
+    app.post('/editIndex',  controller.updateIndex)
+    app.post('/fetchIdWork', controller.fetchByIdWork)
+    app.post('/deleteWork', controller.deleteWork)
 
     //----------------- Admin -------------------//
 
