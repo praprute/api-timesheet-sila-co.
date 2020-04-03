@@ -135,6 +135,8 @@ exports.regisIndex = (req, res, next) => {
     var partner = body.partner;
     var matterCode = body.matterCode;
     var descriptions = body.descriptions;
+    let today = new Date();
+    console.log(today)
 
     req.getConnection((err, connection) => {
         if (err) return next(err)
@@ -145,10 +147,10 @@ exports.regisIndex = (req, res, next) => {
                     if (partner.length > 0) {
                             if (descriptions.length > 0) {
                                 var sql = "INSERT INTO `sila`.`work` \
-                                ( idUser, date, time, clientName, partner, matterCode, descriptions ) VALUES \
-                                (?, ?, ?, ?, ?, ?, ?); "
+                                ( idUser, date, time, clientName, partner, matterCode, descriptions, timestamp ) VALUES \
+                                (?, ?, ?, ?, ?, ?, ?, ?); "
 
-                                connection.query(sql, [idUser, date, time, clientName, partner, matterCode, descriptions], (err, results) => {
+                                connection.query(sql, [idUser, date, time, clientName, partner, matterCode, descriptions, today], (err, results) => {
                                     if (err) {
                                         return next(err)
                                     } else {
