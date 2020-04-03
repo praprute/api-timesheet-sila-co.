@@ -22,21 +22,21 @@ app.use(
     })
 );
 
-// var connection = mysql.createConnection({
-//     host: '128.199.179.127',
-//      user: 'silaadmin',
-//      password: 'silaapp4920',
-//      port: 3306,
-//      database: 'sila'
-//    });
-
 var connection = mysql.createConnection({
-     host: 'localhost',
-     user: 'root',
-     password: '',
+    host: '128.199.179.127',
+     user: 'silaadmin',
+     password: 'silaapp4920',
      port: 3306,
-     database: 'sila-lawer'
+     database: 'sila'
    });
+
+// var connection = mysql.createConnection({
+//      host: 'localhost',
+//      user: 'root',
+//      password: '',
+//      port: 3306,
+//      database: 'sila-lawer'
+//    });
 
    connection.connect((err) => {
        if (err) {
