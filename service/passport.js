@@ -7,7 +7,7 @@ const localOptions = {
 const localLogin = new LocalStrategy(localOptions, function (req, username, password, done) {
     req.getConnection((err, connection) => {
         if (err) return next(err)
-        var sql = "SELECT*FROM `sila`.`user-sila` WHERE email=? ;"
+        var sql = "SELECT*FROM `sila-lawer`.`user-sila` WHERE email=? ;"
         connection.query(sql, [username], (err, results) => {
             if (err) return done(err, false)
             if (!results.length) return done(null, false)

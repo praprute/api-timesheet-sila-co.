@@ -13,7 +13,7 @@ exports.signin = (req, res, next) => {
 
     req.getConnection((err, connection) => {
         if (err) return next(err)
-        var sql = "SELECT*FROM `sila`.`user-sila` WHERE email=? ;"
+        var sql = "SELECT*FROM `sila-lawer`.`user-sila` WHERE email=? ;"
         connection.query(sql, [email], (err, results) => {
             if (err) {
                 return next(err)
@@ -66,7 +66,7 @@ exports.requireSignin = expressJwt({
 exports.fetchAdmin = (req, res, next) => {
     req.getConnection((err, connection) => {
         if (err) return next(err)
-        var sql = "SELECT*FROM `sila`.`user-sila` WHERE status = 1"
+        var sql = "SELECT*FROM `sila-lawer`.`user-sila` WHERE status = 1"
         connection.query(sql, [], (err, results) => {
             if (err) {
                 return next(err)
@@ -91,7 +91,7 @@ exports.isAuthorAdmin = (req, res, next) => {
     req.getConnection((err, connection) => {
         if (err) return next(err)
 
-        var sql = "SELECT `user-sila`.status FROM `sila`.`user-sila` \
+        var sql = "SELECT `user-sila`.status FROM `sila-lawer`.`user-sila` \
         WHERE `user-sila`.email = ? ;"
 
         connection.query(sql, [email], (err, results) => {
@@ -135,6 +135,7 @@ exports.regisIndex = (req, res, next) => {
     var partner = body.partner;
     var matterCode = body.matterCode;
     var descriptions = body.descriptions;
+    var status = body.status
     let today = new Date();
     console.log(today)
 
@@ -145,29 +146,37 @@ exports.regisIndex = (req, res, next) => {
             if (time.length > 0) {
                 if (clientName.length > 0) {
                     if (partner.length > 0) {
-                        if (descriptions.length > 0) {
-                            var sql = "INSERT INTO `sila`.`work` \
-                                ( idUser, date, time, clientName, partner, matterCode, descriptions, timestamp ) VALUES \
-                                (?, ?, ?, ?, ?, ?, ?, ?); "
+                        if (status.length > 0) {
+                            if (descriptions.length > 0) {
+                                var sql = "INSERT INTO `sila-lawer`.`work` \
+                                ( idUser, date, time, clientName, partner, matterCode, descriptions, status, timestamp ) VALUES \
+                                (?, ?, ?, ?, ?, ?, ?, ?, ?); "
 
-                            connection.query(sql, [idUser, date, time, clientName, partner, matterCode, descriptions, today], (err, results) => {
-                                if (err) {
-                                    return next(err)
-                                } else {
-                                    res.json({
-                                        success: "success",
-                                        message: results,
-                                        message_th: "บันทึกข้อมูลเรียบร้อย"
-                                    })
-                                }
+                                connection.query(sql, [idUser, date, time, clientName, partner, matterCode, descriptions, status, today], (err, results) => {
+                                    if (err) {
+                                        return next(err)
+                                    } else {
+                                        res.json({
+                                            success: "success",
+                                            message: results,
+                                            message_th: "บันทึกข้อมูลเรียบร้อย"
+                                        })
+                                    }
 
-                            })
+                                })
 
+                            } else {
+                                res.json({
+                                    success: "error",
+                                    message: null,
+                                    message_th: "กรุณากรอกรายละเอียด"
+                                })
+                            }
                         } else {
                             res.json({
                                 success: "error",
                                 message: null,
-                                message_th: "กรุณากรอกรายละเอียด"
+                                message_th: "กรุณากรอกสถานะ"
                             })
                         }
                     } else {
@@ -218,7 +227,7 @@ exports.register = (req, res, next) => {
             console.log(name.length)
             if (email.length > 0) {
                 if (password.length > 0) {
-                    var sql = "SELECT email FROM `sila`.`user-sila` WHERE email=? ;"
+                    var sql = "SELECT email FROM `sila-lawer`.`user-sila` WHERE email=? ;"
                     connection.query(sql, [email], (err, results) => {
                         if (err) {
                             return next(err)
@@ -230,7 +239,7 @@ exports.register = (req, res, next) => {
                                 message_th: "อีเมล์นี้มีผู้ใช้งานแล้ว"
                             });
                         } else {
-                            var sql = "INSERT INTO `sila`.`user-sila` ( email, password, name) \
+                            var sql = "INSERT INTO `sila-lawer`.`user-sila` ( email, password, name) \
                             VALUES (?, ?, ?);"
                             connection.query(sql, [email, password, name], (err, results) => {
                                 if (err) {
@@ -279,7 +288,7 @@ exports.fetchWorkforUser = (req, res, next) => {
     req.getConnection((err, connection) => {
         if (err) return next(err)
         var sql = "SELECT `user-sila`.name, `work`.id ,`work`.idUser, `work`.date, `work`.time, \
-              `work`.clientName, `work`.partner, `work`.matterCode, `work`.descriptions, `work`.timestamp \
+              `work`.clientName, `work`.partner, `work`.matterCode, `work`.descriptions, `work`.status ,`work`.timestamp \
                FROM `user-sila`, `work`  WHERE `work`.idUser = `user-sila`.id  AND `work`.idUser=? ORDER BY `work`.timestamp DESC;"
         connection.query(sql, [userId], (err, results) => {
             if (err) {
@@ -302,8 +311,8 @@ exports.fetchAllforAdmin = (req, res, next) => {
         if (err) return next(err)
         var sql = "SELECT `work`.id , `user-sila`.name, `user-sila`.email, `work`.date, `work`.time, \
         `work`.clientName, `work`.partner,\
-        `work`.matterCode, `work`.descriptions , `work`.timestamp\
-        FROM `sila`.`work`, `sila`.`user-sila` \
+        `work`.matterCode, `work`.descriptions,  `work`.status, `work`.timestamp\
+        FROM `sila-lawer`.`work`, `sila-lawer`.`user-sila` \
         WHERE `work`.idUser = `user-sila`.id  ORDER BY `work`.timestamp DESC;"
         connection.query(sql, [], (err, results) => {
             if (err) {
@@ -319,10 +328,32 @@ exports.fetchAllforAdmin = (req, res, next) => {
     })
 }
 
+exports.fetchAllforAdminWorksheet = (req, res, next) => {
+    req.getConnection((err, connection) => {
+        if (err) return next(err)
+        var sql = "SELECT `work`.clientName,\
+        `work`.descriptions,  `work`.status\
+        FROM `sila-lawer`.`work`, `sila-lawer`.`user-sila` \
+        WHERE `work`.idUser = `user-sila`.id  ORDER BY `work`.timestamp DESC;"
+        connection.query(sql, [], (err, results) => {
+            if (err) {
+                return next(err)
+            } else {
+                res.json({
+                    success: "success",
+                    message: results,
+                    message_th: "ข้อมูลโดยรวม"
+                })
+            }
+        })
+    })
+}
+
+
 exports.fetchUserForAdmin = (req, res, next) => {
     req.getConnection((err, connection) => {
         if (err) return next(err)
-        var sql = "SELECT*FROM `sila`.`user-sila` WHERE `user-sila`.status = 0 ;"
+        var sql = "SELECT*FROM `sila-lawer`.`user-sila` WHERE `user-sila`.status = 0 ;"
         connection.query(sql, [], (err, results) => {
             if (err) {
                 return next(err)
@@ -347,7 +378,7 @@ exports.fetchByIdForAdmin = (req, res, next) => {
         var sql = "SELECT  `user-sila`.id,`user-sila`.name, `user-sila`.email, `work`.date, `work`.time, \
         `work`.clientName, `work`.partner,\
         `work`.matterCode, `work`.descriptions , `work`.timestamp\
-        FROM `sila`.`work`, `sila`.`user-sila` \
+        FROM `sila-lawer`.`work`, `sila-lawer`.`user-sila` \
         WHERE `work`.idUser = `user-sila`.id AND  `user-sila`.id = ? ORDER BY `work`.timestamp DESC;"
         connection.query(sql, [id], (err, results) => {
             if (err) {
@@ -374,13 +405,14 @@ exports.updateIndex = (req, res, next) => {
     var partner = body.partner
     var matterCode = body.matterCode
     var descriptions = body.descriptions
+    var status = body.status
     var workId = body.workId
     req.getConnection((err, connection) => {
         if (err) return next(err)
         var sql = "UPDATE work SET idUser = ? , \
         date = ? , time = ? , clientName = ? , \
-        partner = ? , matterCode = ? , descriptions = ? WHERE work.id = ? ;"
-        connection.query(sql, [idUser, date, time, clientName, partner, matterCode, descriptions, workId], (err, results) => {
+        partner = ? , matterCode = ? , descriptions = ?, status = ? WHERE work.id = ? ;"
+        connection.query(sql, [idUser, date, time, clientName, partner, matterCode, descriptions, status, workId], (err, results) => {
             if (err) {
                 return next(err)
             } else {
@@ -405,7 +437,7 @@ exports.DailyWork = (req, res, next) => {
         if (err) return next(err)
         var sql = "SELECT work.idUser, `user-sila`.name, work.date, work.time,\
         work.clientName, work.partner, work.matterCode, work.descriptions,\
-        work.timestamp  FROM `sila`.`user-sila`, `sila`.work \
+        work.timestamp  FROM `sila-lawer`.`user-sila`, `sila-lawer`.work \
         WHERE `work`.idUser = `user-sila`.id AND work.date = ? ORDER BY work.timestamp DESC"
         connection.query(sql, [today], (err, results) => {
             if (err) {
@@ -431,7 +463,7 @@ exports.WorkByOptions = (req, res, next) => {
         if (err) return next(err)
         var sql = "SELECT work.idUser, `user-sila`.name, work.date, work.time,\
         work.clientName, work.partner, work.matterCode, work.descriptions,\
-        work.timestamp  FROM `sila`.`user-sila`, `sila`.work \
+        work.timestamp  FROM `sila-lawer`.`user-sila`, `sila-lawer`.work \
         WHERE `work`.idUser = `user-sila`.id AND `work`.date BETWEEN \
         ? AND ? ORDER BY work.timestamp DESC"
         connection.query(sql, [datef, datet], (err, results) => {
@@ -457,7 +489,7 @@ exports.fetchDivision = (req, res, next) => {
         if (err) return next(err)
         var sql = "SELECT work.idUser, `user-sila`.name, work.date, work.time,\
         work.clientName, work.partner, work.matterCode, work.descriptions,\
-        work.timestamp  FROM `sila`.`user-sila`, `sila`.work \
+        work.timestamp  FROM `sila-lawer`.`user-sila`, `sila-lawer`.work \
         WHERE `work`.idUser = `user-sila`.id AND `work`.partner=? \
         ORDER BY work.timestamp DESC ;"
         connection.query(sql, [partner], (err, results) => {
@@ -484,7 +516,7 @@ exports.fetchByIdWork = (req, res, next) => {
     req.getConnection((err, connection) => {
         if (err) return next(err)
         var sql = "SELECT  `work`.id ,`user-sila`.name ,`work`.idUser, `work`.date, `work`.time, \
-        `work`.clientName, `work`.partner, `work`.matterCode, `work`.descriptions, `work`.timestamp \
+        `work`.clientName, `work`.partner, `work`.matterCode, `work`.descriptions, `work`.status, `work`.timestamp \
         FROM `user-sila`, `work`  WHERE `work`.idUser = `user-sila`.id  AND `work`.id=? ;"
         connection.query(sql, [id], (err, results) => {
             if (err) {
@@ -500,7 +532,7 @@ exports.fetchByIdWork = (req, res, next) => {
     })
 }
 
-//DELETE FROM `sila`.`work` WHERE (`id` = '32');
+//DELETE FROM `sila-lawer`.`work` WHERE (`id` = '32');
 
 exports.deleteWork = (req, res, next) => {
 
@@ -512,7 +544,7 @@ exports.deleteWork = (req, res, next) => {
 
     req.getConnection((err, connection) => {
         if (err) return next(err)
-        var sql = "DELETE FROM `sila`.`work` WHERE `work`.id=?;"
+        var sql = "DELETE FROM `sila-lawer`.`work` WHERE `work`.id=?;"
         connection.query(sql, [id], (err, results) => {
             if (err) {
                 return next(err)
